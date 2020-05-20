@@ -2,7 +2,6 @@
 
 namespace webvimark\modules\UserManagement\controllers;
 
-use Yii;
 use webvimark\modules\UserManagement\models\UserVisitLog;
 use webvimark\modules\UserManagement\models\search\UserVisitLogSearch;
 use webvimark\components\AdminDefaultController;

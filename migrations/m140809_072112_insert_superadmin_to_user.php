@@ -20,8 +20,7 @@ class m140809_072112_insert_superadmin_to_user extends Migration
 	{
 		$user = User::findByUsername('superadmin');
 
-		if ( $user )
-		{
+		if ($user) {
 			$user->delete();
 		}
 	}

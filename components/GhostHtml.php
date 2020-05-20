@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @var $this yii\web\View
  */
@@ -24,8 +25,7 @@ class GhostHtml extends Html
 	 */
 	public static function a($text, $url = null, $options = [])
 	{
-		if ( in_array($url, [null, '', '#']) )
-		{
+		if (in_array($url, [null, '', '#'])) {
 			return parent::a($text, $url, $options);
 		}
 

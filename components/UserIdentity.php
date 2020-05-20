@@ -1,4 +1,5 @@
 <?php
+
 namespace webvimark\modules\UserManagement\components;
 
 use webvimark\modules\UserManagement\models\User;
@@ -60,10 +61,9 @@ abstract class UserIdentity extends ActiveRecord implements IdentityInterface
 		$expire    = Yii::$app->getModule('user-management')->confirmationTokenExpire;
 
 		$parts     = explode('_', $token);
-		$timestamp = (int)end($parts);
+		$timestamp = (int) end($parts);
 
-		if ( $timestamp + $expire < time() )
-		{
+		if ($timestamp + $expire < time()) {
 			// token expired
 			return null;
 		}
@@ -85,10 +85,9 @@ abstract class UserIdentity extends ActiveRecord implements IdentityInterface
 		$expire    = Yii::$app->getModule('user-management')->confirmationTokenExpire;
 
 		$parts     = explode('_', $token);
-		$timestamp = (int)end($parts);
+		$timestamp = (int) end($parts);
 
-		if ( $timestamp + $expire < time() )
-		{
+		if ($timestamp + $expire < time()) {
 			// token expired
 			return null;
 		}
@@ -141,13 +140,10 @@ abstract class UserIdentity extends ActiveRecord implements IdentityInterface
 	 */
 	public function setPassword($password)
 	{
-		if ( php_sapi_name() == 'cli' )
-		{
+		if (php_sapi_name() == 'cli') {
 			$security = new Security();
 			$this->password_hash = $security->generatePasswordHash($password);
-		}
-		else
-		{
+		} else {
 			$this->password_hash = Yii::$app->security->generatePasswordHash($password);
 		}
 	}
@@ -157,13 +153,10 @@ abstract class UserIdentity extends ActiveRecord implements IdentityInterface
 	 */
 	public function generateAuthKey()
 	{
-		if ( php_sapi_name() == 'cli' )
-		{
+		if (php_sapi_name() == 'cli') {
 			$security = new Security();
 			$this->auth_key = $security->generateRandomString();
-		}
-		else
-		{
+		} else {
 			$this->auth_key = Yii::$app->security->generateRandomString();
 		}
 	}

@@ -28,10 +28,9 @@ class UserController extends AdminDefaultController
 	 */
 	public function actionCreate()
 	{
-		$model = new User(['scenario'=>'newUser']);
+		$model = new User(['scenario' => 'newUser']);
 
-		if ( $model->load(Yii::$app->request->post()) && $model->save() )
-		{
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view',	'id' => $model->id]);
 		}
 
@@ -48,19 +47,16 @@ class UserController extends AdminDefaultController
 	{
 		$model = User::findOne($id);
 
-		if ( !$model )
-		{
+		if (!$model) {
 			throw new NotFoundHttpException('User not found');
 		}
 
 		$model->scenario = 'changePassword';
 
-		if ( $model->load(Yii::$app->request->post()) && $model->save() )
-		{
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view',	'id' => $model->id]);
 		}
 
 		return $this->renderIsAjax('changePassword', compact('model'));
 	}
-
 }

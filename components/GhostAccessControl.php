@@ -9,6 +9,9 @@ use Yii;
 use yii\base\ActionFilter;
 use yii\web\ForbiddenHttpException;
 
+/**
+ * 
+ */
 class GhostAccessControl extends ActionFilter
 {
 	/**
@@ -35,53 +38,43 @@ class GhostAccessControl extends ActionFilter
 	 */
 	public function beforeAction($action)
 	{
-		if ( $action->id == 'captcha' )
-		{
+		if ($action->id == 'captcha') {
 			return true;
 		}
 
 		$route = '/' . $action->uniqueId;
 
-		if ( Route::isFreeAccess($route, $action) )
-		{
+		if (Route::isFreeAccess($route, $action)) {
 			return true;
 		}
 
-		if ( Yii::$app->user->isGuest )
-		{
+		if (Yii::$app->user->isGuest) {
 			$this->denyAccess();
 		}
 
 		// If user has been deleted, then destroy session and redirect to home page
-		if ( ! Yii::$app->user->isGuest AND Yii::$app->user->identity === null )
-		{
+		if (!Yii::$app->user->isGuest and Yii::$app->user->identity === null) {
 			Yii::$app->getSession()->destroy();
 			$this->denyAccess();
 		}
 
 		// Superadmin owns everyone
-		if ( Yii::$app->user->isSuperadmin )
-		{
+		if (Yii::$app->user->isSuperadmin) {
 			return true;
 		}
 
-		if ( Yii::$app->user->identity AND Yii::$app->user->identity->status != User::STATUS_ACTIVE)
-		{
+		if (Yii::$app->user->identity and Yii::$app->user->identity->status != User::STATUS_ACTIVE) {
 			Yii::$app->user->logout();
 			Yii::$app->getResponse()->redirect(Yii::$app->getHomeUrl());
 		}
 
-		if ( User::canRoute($route) )
-		{
+		if (User::canRoute($route)) {
 			return true;
 		}
 
-		if ( isset($this->denyCallback) )
-		{
+		if (isset($this->denyCallback)) {
 			call_user_func($this->denyCallback, null, $action);
-		}
-		else
-		{
+		} else {
 			$this->denyAccess();
 		}
 
@@ -98,19 +91,14 @@ class GhostAccessControl extends ActionFilter
 	 */
 	protected function denyAccess()
 	{
-		if ( Yii::$app->user->getIsGuest() )
-		{
-			if (isset($_SERVER['HTTP_USER_AGENT']) && (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE') !== false)){
+		if (Yii::$app->user->getIsGuest()) {
+			if (isset($_SERVER['HTTP_USER_AGENT']) && (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE') !== false)) {
 				Yii::$app->user->loginRequired(Yii::$app->request->isAjax, (strpos(Yii::$app->request->headers->get('Accept'), 'html') !== false));
 			} else {
 				Yii::$app->user->loginRequired();
 			}
-
-		}
-		else
-		{
+		} else {
 			throw new ForbiddenHttpException(Yii::t('yii', 'You are not allowed to perform this action.'));
 		}
 	}
-
 }

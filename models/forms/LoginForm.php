@@ -1,4 +1,5 @@
 <?php
+
 namespace webvimark\modules\UserManagement\models\forms;
 
 use webvimark\helpers\LittleBigHelper;
@@ -7,6 +8,9 @@ use webvimark\modules\UserManagement\UserManagementModule;
 use yii\base\Model;
 use Yii;
 
+/**
+ * 
+ */
 class LoginForm extends Model
 {
 	public $username;
@@ -44,18 +48,15 @@ class LoginForm extends Model
 	 */
 	public function validatePassword()
 	{
-		if ( !Yii::$app->getModule('user-management')->checkAttempts() )
-		{
+		if (!Yii::$app->getModule('user-management')->checkAttempts()) {
 			$this->addError('password', UserManagementModule::t('front', 'Too many attempts'));
 
 			return false;
 		}
 
-		if ( !$this->hasErrors() )
-		{
+		if (!$this->hasErrors()) {
 			$user = $this->getUser();
-			if ( !$user || !$user->validatePassword($this->password) )
-			{
+			if (!$user || !$user->validatePassword($this->password)) {
 				$this->addError('password', UserManagementModule::t('front', 'Incorrect username or password.'));
 			}
 		}
@@ -68,14 +69,12 @@ class LoginForm extends Model
 	{
 		$user = $this->getUser();
 
-		if ( $user AND $user->bind_to_ip )
-		{
+		if ($user and $user->bind_to_ip) {
 			$ips = explode(',', $user->bind_to_ip);
 
 			$ips = array_map('trim', $ips);
 
-			if ( !in_array(LittleBigHelper::getRealIp(), $ips) )
-			{
+			if (!in_array(LittleBigHelper::getRealIp(), $ips)) {
 				$this->addError('password', UserManagementModule::t('front', "You could not login from this IP"));
 			}
 		}
@@ -87,12 +86,9 @@ class LoginForm extends Model
 	 */
 	public function login()
 	{
-		if ( $this->validate() )
-		{
+		if ($this->validate()) {
 			return Yii::$app->user->login($this->getUser(), $this->rememberMe ? Yii::$app->user->cookieLifetime : 0);
-		}
-		else
-		{
+		} else {
 			return false;
 		}
 	}
@@ -103,8 +99,7 @@ class LoginForm extends Model
 	 */
 	public function getUser()
 	{
-		if ( $this->_user === false )
-		{
+		if ($this->_user === false) {
 			$u = new \Yii::$app->user->identityClass;
 			$this->_user = ($u instanceof User ? $u->findByUsername($this->username) : User::findByUsername($this->username));
 		}

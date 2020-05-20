@@ -12,6 +12,9 @@ use webvimark\components\AdminDefaultController;
 use webvimark\modules\UserManagement\UserManagementModule;
 use Yii;
 
+/**
+ * 
+ */
 class PermissionController extends AdminDefaultController
 {
 	/**
@@ -41,8 +44,7 @@ class PermissionController extends AdminDefaultController
 			->all();
 
 		$permissionsByGroup = [];
-		foreach ($permissions as $permission)
-		{
+		foreach ($permissions as $permission) {
 			$permissionsByGroup[@$permission->group->name][] = $permission;
 		}
 
@@ -75,7 +77,7 @@ class PermissionController extends AdminDefaultController
 
 		Yii::$app->session->setFlash('success', UserManagementModule::t('back', 'Saved'));
 
-		return $this->redirect(['view', 'id'=>$id]);
+		return $this->redirect(['view', 'id' => $id]);
 	}
 
 	/**
@@ -99,8 +101,7 @@ class PermissionController extends AdminDefaultController
 		Permission::addChildren($id, $toAdd);
 		Permission::removeChildren($id, $toRemove);
 
-		if ( ( $toAdd OR $toRemove ) AND ( $id == Yii::$app->getModule('user-management')->commonPermissionName ) )
-		{
+		if (($toAdd or $toRemove) and ($id == Yii::$app->getModule('user-management')->commonPermissionName)) {
 			Yii::$app->cache->delete('__commonRoutes');
 		}
 
@@ -108,7 +109,7 @@ class PermissionController extends AdminDefaultController
 
 		Yii::$app->session->setFlash('success', UserManagementModule::t('back', 'Saved'));
 
-		return $this->redirect(['view', 'id'=>$id]);
+		return $this->redirect(['view', 'id' => $id]);
 	}
 
 	/**
@@ -123,7 +124,7 @@ class PermissionController extends AdminDefaultController
 	{
 		Route::refreshRoutes($deleteUnused !== null);
 
-		return $this->redirect(['view', 'id'=>$id]);
+		return $this->redirect(['view', 'id' => $id]);
 	}
 
 
@@ -137,9 +138,8 @@ class PermissionController extends AdminDefaultController
 		$model = new Permission();
 		$model->scenario = 'webInput';
 
-		if ( $model->load(Yii::$app->request->post()) && $model->save() )
-		{
-			return $this->redirect(['view', 'id'=>$model->name]);
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			return $this->redirect(['view', 'id' => $model->name]);
 		}
 
 		return $this->renderIsAjax('create', compact('model'));
@@ -158,11 +158,10 @@ class PermissionController extends AdminDefaultController
 		$model = $this->findModel($id);
 		$model->scenario = 'webInput';
 
-		if ( $model->load(Yii::$app->request->post()) AND $model->save())
-		{
-			return $this->redirect(['view', 'id'=>$model->name]);
+		if ($model->load(Yii::$app->request->post()) and $model->save()) {
+			return $this->redirect(['view', 'id' => $model->name]);
 		}
 
 		return $this->renderIsAjax('update', compact('model'));
 	}
-} 
+}

@@ -1,13 +1,16 @@
 <?php
+
 namespace webvimark\modules\UserManagement\models\rbacDB;
 
 use webvimark\modules\UserManagement\components\AuthHelper;
 use yii\base\Action;
-use yii\db\Expression;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
 use Yii;
 
+/**
+ * 
+ */
 class Route extends AbstractItem
 {
 	const ITEM_TYPE = self::TYPE_ROUTE;
@@ -24,8 +27,7 @@ class Route extends AbstractItem
 	{
 		$permissions = array_keys(Permission::getUserPermissions($userId));
 
-		if ( !$permissions )
-		{
+		if (!$permissions) {
 			return [];
 		}
 
@@ -35,9 +37,9 @@ class Route extends AbstractItem
 		$routes = (new Query)
 			->select(['name'])
 			->from($auth_item)
-			->innerJoin($auth_item_child, '('.$auth_item_child.'.child = '.$auth_item.'.name AND '.$auth_item.'.type = :type)')
+			->innerJoin($auth_item_child, '(' . $auth_item_child . '.child = ' . $auth_item . '.name AND ' . $auth_item . '.type = :type)')
 			->params([
-				':type'=>self::TYPE_ROUTE,
+				':type' => self::TYPE_ROUTE,
 			])
 			->where([
 				$auth_item_child . '.parent' => $permissions,
@@ -59,12 +61,9 @@ class Route extends AbstractItem
 	{
 		$result = [];
 
-		foreach ($allRoutes as $route)
-		{
-			foreach ($givenRoutes as $givenRoute)
-			{
-				if ( static::isSubRoute($givenRoute, $route) )
-				{
+		foreach ($allRoutes as $route) {
+			foreach ($givenRoutes as $givenRoute) {
+				if (static::isSubRoute($givenRoute, $route)) {
 					$result[] = $route;
 				}
 			}
@@ -85,18 +84,15 @@ class Route extends AbstractItem
 	 */
 	public static function isSubRoute($route, $candidate)
 	{
-		if ( $route == $candidate )
-		{
+		if ($route == $candidate) {
 			return true;
 		}
 
 		// If it's full access to module or controller
-		if ( substr($route, -2) == '/*' )
-		{
+		if (substr($route, -2) == '/*') {
 			$route = rtrim($route, '*');
 
-			if ( strpos($candidate, $route) === 0 )
-			{
+			if (strpos($candidate, $route) === 0) {
 				return true;
 			}
 		}
@@ -123,25 +119,21 @@ class Route extends AbstractItem
 
 		$toAdd = array_diff(array_keys($allRoutes), array_keys($currentRoutes));
 
-		foreach ($toAdd as $addItem)
-		{
+		foreach ($toAdd as $addItem) {
 			Route::create($addItem);
 		}
 
 		$toRemove = false;
-		if ( $deleteUnusedRoutes )
-		{
+		if ($deleteUnusedRoutes) {
 			$toRemove = array_diff(array_keys($currentRoutes), array_keys($allRoutes));
 
-			if ( $toRemove )
-			{
+			if ($toRemove) {
 				Route::deleteAll(['in', 'name', $toRemove]);
 			}
 		}
 
 
-		if ( $toAdd || $toRemove )
-		{
+		if ($toAdd || $toRemove) {
 			if (Yii::$app->cache) {
 				Yii::$app->cache->delete('__commonRoutes');
 			}
@@ -158,16 +150,13 @@ class Route extends AbstractItem
 	 */
 	public static function isRouteAllowed($route, $allowedRoutes)
 	{
-		if ( in_array($route, $allowedRoutes) )
-		{
+		if (in_array($route, $allowedRoutes)) {
 			return true;
 		}
 
-		foreach ($allowedRoutes as $allowedRoute)
-		{
+		foreach ($allowedRoutes as $allowedRoute) {
 			// If some controller fully allowed (wildcard)
-			if (substr($allowedRoute, -1) == '*')
-			{
+			if (substr($allowedRoute, -1) == '*') {
 				$routeArray = explode('/', $route);
 				array_splice($routeArray, -1);
 
@@ -194,17 +183,14 @@ class Route extends AbstractItem
 	 */
 	public static function isFreeAccess($route, $action = null)
 	{
-		if ( $action )
-		{
+		if ($action) {
 			$controller = $action->controller;
 
-			if ( $controller->hasProperty('freeAccess') AND $controller->freeAccess === true )
-			{
+			if ($controller->hasProperty('freeAccess') and $controller->freeAccess === true) {
 				return true;
 			}
 
-			if ( $controller->hasProperty('freeAccessActions') AND in_array($action->id, $controller->freeAccessActions) )
-			{
+			if ($controller->hasProperty('freeAccessActions') and in_array($action->id, $controller->freeAccessActions)) {
 				return true;
 			}
 		}
@@ -215,19 +201,16 @@ class Route extends AbstractItem
 			AuthHelper::unifyRoute(Yii::$app->user->loginUrl),
 		];
 
-		if ( in_array($route, $systemPages) )
-		{
+		if (in_array($route, $systemPages)) {
 			return true;
 		}
 
 		// Registration can be enabled either by this option or by adding '/user-management/auth/registration' route to guest permissions
-		if ( $route == '/user-management/auth/registration' && Yii::$app->getModule('user-management')->enableRegistration === true )
-		{
+		if ($route == '/user-management/auth/registration' && Yii::$app->getModule('user-management')->enableRegistration === true) {
 			return true;
 		}
 
-		if ( static::isInCommonPermission($route) )
-		{
+		if (static::isInCommonPermission($route)) {
 			return true;
 		}
 
@@ -245,17 +228,16 @@ class Route extends AbstractItem
 	{
 		$commonRoutes = Yii::$app->cache ? Yii::$app->cache->get('__commonRoutes') : false;
 
-		if ( $commonRoutes === false )
-		{
+		if ($commonRoutes === false) {
 			$commonRoutesDB = (new Query())
 				->select('child')
 				->from(Yii::$app->getModule('user-management')->auth_item_child_table)
-				->where(['parent'=>Yii::$app->getModule('user-management')->commonPermissionName])
+				->where(['parent' => Yii::$app->getModule('user-management')->commonPermissionName])
 				->column();
 
 			$commonRoutes = Route::withSubRoutes($commonRoutesDB, ArrayHelper::map(Route::find()->asArray()->all(), 'name', 'name'));
 
-			if ( Yii::$app->cache )
+			if (Yii::$app->cache)
 				Yii::$app->cache->set('__commonRoutes', $commonRoutes, 3600);
 		}
 

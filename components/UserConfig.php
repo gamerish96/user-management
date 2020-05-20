@@ -20,12 +20,12 @@ class UserConfig extends User
 	 * @inheritdoc
 	 */
 	public $enableAutoLogin = true;
-	
+
 	/**
- 	 * @inheritdoc
+	 * @inheritdoc
 	 */
 	public $cookieLifetime = 2592000;
-  
+
 	/**
 	 * @inheritdoc
 	 */
@@ -58,5 +58,4 @@ class UserConfig extends User
 
 		parent::afterLogin($identity, $cookieBased, $duration);
 	}
-
 }

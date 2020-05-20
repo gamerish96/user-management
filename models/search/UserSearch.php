@@ -32,9 +32,8 @@ class UserSearch extends User
 
 		$query->with(['roles']);
 
-		if ( !Yii::$app->user->isSuperadmin )
-		{
-			$query->where(['superadmin'=>0]);
+		if (!Yii::$app->user->isSuperadmin) {
+			$query->where(['superadmin' => 0]);
 		}
 
 		$dataProvider = new ActiveDataProvider([
@@ -42,9 +41,9 @@ class UserSearch extends User
 			'pagination' => [
 				'pageSize' => Yii::$app->request->cookies->getValue('_grid_page_size', 20),
 			],
-			'sort'=>[
-				'defaultOrder'=>[
-					'id'=>SORT_DESC,
+			'sort' => [
+				'defaultOrder' => [
+					'id' => SORT_DESC,
 				],
 			],
 		]);
@@ -53,8 +52,7 @@ class UserSearch extends User
 			return $dataProvider;
 		}
 
-		if ( $this->gridRoleSearch )
-		{
+		if ($this->gridRoleSearch) {
 			$query->joinWith(['roles']);
 		}
 
@@ -69,7 +67,7 @@ class UserSearch extends User
 			'email_confirmed' => $this->email_confirmed,
 		]);
 
-        	$query->andFilterWhere(['like', 'username', $this->username])
+		$query->andFilterWhere(['like', 'username', $this->username])
 			->andFilterWhere(['like', 'email', $this->email]);
 
 		return $dataProvider;

@@ -8,14 +8,13 @@ class m140608_173539_create_user_table extends Migration
 	public function safeUp()
 	{
 		$tableOptions = null;
-		if ( $this->db->driverName === 'mysql' )
-		{
+		if ($this->db->driverName === 'mysql') {
 			$tableOptions = 'CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=InnoDB';
 		}
 
-	        // Check if user Table exist
-	        // $tablename = \Yii::$app->db->tablePrefix.'user';
-	        $tablename = \Yii::$app->getModule('user-management')->user_table;
+		// Check if user Table exist
+		// $tablename = \Yii::$app->db->tablePrefix.'user';
+		$tablename = \Yii::$app->getModule('user-management')->user_table;
 
 		// Create user table
 		$this->createTable($tablename, array(

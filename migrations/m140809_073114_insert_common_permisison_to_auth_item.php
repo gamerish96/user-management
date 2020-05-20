@@ -13,10 +13,9 @@ class m140809_073114_insert_common_permisison_to_auth_item extends Migration
 
 	public function safeDown()
 	{
-		$permission = Permission::findOne(['name'=>Yii::$app->getModule('user-management')->commonPermissionName]);
+		$permission = Permission::findOne(['name' => Yii::$app->getModule('user-management')->commonPermissionName]);
 
-		if ( $permission )
-		{
+		if ($permission) {
 			$permission->delete();
 		}
 	}

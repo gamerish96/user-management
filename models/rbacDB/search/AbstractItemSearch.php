@@ -26,7 +26,7 @@ abstract class AbstractItemSearch extends AbstractItem
 
 	public function search($params)
 	{
-		$query = ( static::ITEM_TYPE == static::TYPE_ROLE ) ? Role::find() : Permission::find();
+		$query = (static::ITEM_TYPE == static::TYPE_ROLE) ? Role::find() : Permission::find();
 
 		$query->joinWith(['group']);
 
@@ -35,9 +35,9 @@ abstract class AbstractItemSearch extends AbstractItem
 			'pagination' => [
 				'pageSize' => \Yii::$app->request->cookies->getValue('_grid_page_size', 20),
 			],
-			'sort'=>[
-				'defaultOrder'=>[
-					'created_at'=>SORT_DESC,
+			'sort' => [
+				'defaultOrder' => [
+					'created_at' => SORT_DESC,
 				],
 			],
 		]);
@@ -46,9 +46,9 @@ abstract class AbstractItemSearch extends AbstractItem
 			return $dataProvider;
 		}
 
-        	$query->andFilterWhere(['like', Yii::$app->getModule('user-management')->auth_item_table.'.name', $this->name])
-			->andFilterWhere(['like', Yii::$app->getModule('user-management')->auth_item_table.'.description', $this->description])
-			->andFilterWhere([Yii::$app->getModule('user-management')->auth_item_table.'.group_code'=>$this->group_code]);
+		$query->andFilterWhere(['like', Yii::$app->getModule('user-management')->auth_item_table . '.name', $this->name])
+			->andFilterWhere(['like', Yii::$app->getModule('user-management')->auth_item_table . '.description', $this->description])
+			->andFilterWhere([Yii::$app->getModule('user-management')->auth_item_table . '.group_code' => $this->group_code]);
 
 		return $dataProvider;
 	}

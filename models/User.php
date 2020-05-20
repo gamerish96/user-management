@@ -59,15 +59,13 @@ class User extends UserIdentity
 	 */
 	public static function getCurrentUser($fromSingleton = true)
 	{
-		if ( !$fromSingleton )
-		{
+		if (!$fromSingleton) {
 			return static::findOne(Yii::$app->user->id);
 		}
 
 		$user = Singleton::getData('__currentUser');
 
-		if ( !$user )
-		{
+		if (!$user) {
 			$user = static::findOne(Yii::$app->user->id);
 
 			Singleton::setData('__currentUser', $user);
@@ -86,8 +84,7 @@ class User extends UserIdentity
 	 */
 	public static function assignRole($userId, $roleName)
 	{
-		try
-		{
+		try {
 			Yii::$app->db->createCommand()
 				->insert(Yii::$app->getModule('user-management')->auth_assignment_table, [
 					'user_id' => $userId,
@@ -98,9 +95,7 @@ class User extends UserIdentity
 			AuthHelper::invalidatePermissions();
 
 			return true;
-		}
-		catch (\Exception $e)
-		{
+		} catch (\Exception $e) {
 			return false;
 		}
 	}
@@ -119,8 +114,7 @@ class User extends UserIdentity
 			->delete(Yii::$app->getModule('user-management')->auth_assignment_table, ['user_id' => $userId, 'item_name' => $roleName])
 			->execute() > 0;
 
-		if ( $result )
-		{
+		if ($result) {
 			AuthHelper::invalidatePermissions();
 		}
 
@@ -135,15 +129,14 @@ class User extends UserIdentity
 	 */
 	public static function hasRole($roles, $superAdminAllowed = true)
 	{
-		if ( $superAdminAllowed AND Yii::$app->user->isSuperadmin )
-		{
+		if ($superAdminAllowed and Yii::$app->user->isSuperadmin) {
 			return true;
 		}
-		$roles = (array)$roles;
+		$roles = (array) $roles;
 
 		AuthHelper::ensurePermissionsUpToDate();
 
-		return array_intersect($roles, Yii::$app->session->get(AuthHelper::SESSION_PREFIX_ROLES,[])) !== [];
+		return array_intersect($roles, Yii::$app->session->get(AuthHelper::SESSION_PREFIX_ROLES, [])) !== [];
 	}
 
 	/**
@@ -154,14 +147,13 @@ class User extends UserIdentity
 	 */
 	public static function hasPermission($permission, $superAdminAllowed = true)
 	{
-		if ( $superAdminAllowed AND Yii::$app->user->isSuperadmin )
-		{
+		if ($superAdminAllowed and Yii::$app->user->isSuperadmin) {
 			return true;
 		}
 
 		AuthHelper::ensurePermissionsUpToDate();
 
-		return in_array($permission, Yii::$app->session->get(AuthHelper::SESSION_PREFIX_PERMISSIONS,[]));
+		return in_array($permission, Yii::$app->session->get(AuthHelper::SESSION_PREFIX_PERMISSIONS, []));
 	}
 
 	/**
@@ -180,21 +172,19 @@ class User extends UserIdentity
 	 */
 	public static function canRoute($route, $superAdminAllowed = true)
 	{
-		if ( $superAdminAllowed AND Yii::$app->user->isSuperadmin )
-		{
+		if ($superAdminAllowed and Yii::$app->user->isSuperadmin) {
 			return true;
 		}
 
 		$baseRoute = AuthHelper::unifyRoute($route);
 
-		if ( Route::isFreeAccess($baseRoute) )
-		{
+		if (Route::isFreeAccess($baseRoute)) {
 			return true;
 		}
 
 		AuthHelper::ensurePermissionsUpToDate();
 
-		return Route::isRouteAllowed($baseRoute, Yii::$app->session->get(AuthHelper::SESSION_PREFIX_ROUTES,[]));
+		return Route::isRouteAllowed($baseRoute, Yii::$app->session->get(AuthHelper::SESSION_PREFIX_ROUTES, []));
 	}
 
 	/**
@@ -221,20 +211,20 @@ class User extends UserIdentity
 	{
 		$ar = self::getStatusList();
 
-		return isset( $ar[$val] ) ? $ar[$val] : $val;
+		return isset($ar[$val]) ? $ar[$val] : $val;
 	}
 
 	/**
-	* @inheritdoc
-	*/
+	 * @inheritdoc
+	 */
 	public static function tableName()
 	{
 		return Yii::$app->getModule('user-management')->user_table;
 	}
 
 	/**
-	* @inheritdoc
-	*/
+	 * @inheritdoc
+	 */
 	public function behaviors()
 	{
 		return [
@@ -243,8 +233,8 @@ class User extends UserIdentity
 	}
 
 	/**
-	* @inheritdoc
-	*/
+	 * @inheritdoc
+	 */
 	public function rules()
 	{
 		return [
@@ -261,13 +251,13 @@ class User extends UserIdentity
 			['bind_to_ip', 'trim'],
 			['bind_to_ip', 'string', 'max' => 255],
 
-			['password', 'required', 'on'=>['newUser', 'changePassword']],
-			['password', 'string', 'max' => 255, 'on'=>['newUser', 'changePassword']],
-			['password', 'trim', 'on'=>['newUser', 'changePassword']],
+			['password', 'required', 'on' => ['newUser', 'changePassword']],
+			['password', 'string', 'max' => 255, 'on' => ['newUser', 'changePassword']],
+			['password', 'trim', 'on' => ['newUser', 'changePassword']],
 			['password', 'match', 'pattern' => Yii::$app->getModule('user-management')->passwordRegexp],
 
-			['repeat_password', 'required', 'on'=>['newUser', 'changePassword']],
-			['repeat_password', 'compare', 'compareAttribute'=>'password'],
+			['repeat_password', 'required', 'on' => ['newUser', 'changePassword']],
+			['repeat_password', 'compare', 'compareAttribute' => 'password'],
 		];
 	}
 
@@ -276,15 +266,13 @@ class User extends UserIdentity
 	 */
 	public function validateEmailConfirmedUnique()
 	{
-		if ( $this->email )
-		{
+		if ($this->email) {
 			$exists = User::findOne([
 				'email'           => $this->email,
 				'email_confirmed' => 1,
 			]);
 
-			if ( $exists AND $exists->id != $this->id )
-			{
+			if ($exists and $exists->id != $this->id) {
 				$this->addError('email', UserManagementModule::t('front', 'This E-mail already exists'));
 			}
 		}
@@ -295,14 +283,11 @@ class User extends UserIdentity
 	 */
 	public function validateBindToIp()
 	{
-		if ( $this->bind_to_ip )
-		{
+		if ($this->bind_to_ip) {
 			$ips = explode(',', $this->bind_to_ip);
 
-			foreach ($ips as $ip)
-			{
-				if ( !filter_var(trim($ip), FILTER_VALIDATE_IP) )
-				{
+			foreach ($ips as $ip) {
+				if (!filter_var(trim($ip), FILTER_VALIDATE_IP)) {
 					$this->addError('bind_to_ip', UserManagementModule::t('back', "Wrong format. Enter valid IPs separated by comma"));
 				}
 			}
@@ -338,7 +323,7 @@ class User extends UserIdentity
 	public function getRoles()
 	{
 		return $this->hasMany(Role::className(), ['name' => 'item_name'])
-			->viaTable(Yii::$app->getModule('user-management')->auth_assignment_table, ['user_id'=>'id']);
+			->viaTable(Yii::$app->getModule('user-management')->auth_assignment_table, ['user_id' => 'id']);
 	}
 
 
@@ -350,42 +335,33 @@ class User extends UserIdentity
 	 */
 	public function beforeSave($insert)
 	{
-		if ( $insert )
-		{
-			if ( php_sapi_name() != 'cli' )
-			{
+		if ($insert) {
+			if (php_sapi_name() != 'cli') {
 				$this->registration_ip = LittleBigHelper::getRealIp();
 			}
 			$this->generateAuthKey();
-		}
-		else
-		{
+		} else {
 			// Console doesn't have Yii::$app->user, so we skip it for console
-			if ( php_sapi_name() != 'cli' )
-			{
-				if ( Yii::$app->user->id == $this->id )
-				{
+			if (php_sapi_name() != 'cli') {
+				if (Yii::$app->user->id == $this->id) {
 					// Make sure user will not deactivate himself
 					$this->status = static::STATUS_ACTIVE;
 
 					// Superadmin could not demote himself
-					if ( Yii::$app->user->isSuperadmin AND $this->superadmin != 1 )
-					{
+					if (Yii::$app->user->isSuperadmin and $this->superadmin != 1) {
 						$this->superadmin = 1;
 					}
 				}
 
 				// Don't let non-superadmin edit superadmin
-				if ( isset($this->oldAttributes['superadmin']) && !Yii::$app->user->isSuperadmin && $this->oldAttributes['superadmin'] == 1 )
-				{
+				if (isset($this->oldAttributes['superadmin']) && !Yii::$app->user->isSuperadmin && $this->oldAttributes['superadmin'] == 1) {
 					return false;
 				}
 			}
 		}
 
 		// If password has been set, than create password hash
-		if ( $this->password )
-		{
+		if ($this->password) {
 			$this->setPassword($this->password);
 		}
 
@@ -400,17 +376,14 @@ class User extends UserIdentity
 	public function beforeDelete()
 	{
 		// Console doesn't have Yii::$app->user, so we skip it for console
-		if ( php_sapi_name() != 'cli' )
-		{
+		if (php_sapi_name() != 'cli') {
 			// Don't let delete yourself
-			if ( Yii::$app->user->id == $this->id )
-			{
+			if (Yii::$app->user->id == $this->id) {
 				return false;
 			}
 
 			// Don't let non-superadmin delete superadmin
-			if ( !Yii::$app->user->isSuperadmin AND $this->superadmin == 1 )
-			{
+			if (!Yii::$app->user->isSuperadmin and $this->superadmin == 1) {
 				return false;
 			}
 		}

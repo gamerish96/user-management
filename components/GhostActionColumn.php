@@ -5,6 +5,9 @@ namespace webvimark\modules\UserManagement\components;
 use webvimark\modules\UserManagement\models\User;
 use yii\grid\ActionColumn;
 
+/**
+ * 
+ */
 class GhostActionColumn extends ActionColumn
 {
 
@@ -36,5 +39,4 @@ class GhostActionColumn extends ActionColumn
             return '';
         }, $this->template);
     }
-
 }

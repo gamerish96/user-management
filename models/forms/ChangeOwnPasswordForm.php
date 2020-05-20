@@ -1,4 +1,5 @@
 <?php
+
 namespace webvimark\modules\UserManagement\models\forms;
 
 use webvimark\modules\UserManagement\models\User;
@@ -6,6 +7,9 @@ use webvimark\modules\UserManagement\UserManagementModule;
 use yii\base\Model;
 use Yii;
 
+/**
+ * 
+ */
 class ChangeOwnPasswordForm extends Model
 {
 	/**
@@ -17,10 +21,12 @@ class ChangeOwnPasswordForm extends Model
 	 * @var string
 	 */
 	public $current_password;
+
 	/**
 	 * @var string
 	 */
 	public $password;
+
 	/**
 	 * @var string
 	 */
@@ -33,14 +39,14 @@ class ChangeOwnPasswordForm extends Model
 	{
 		return [
 			[['password', 'repeat_password'], 'required'],
-			[['password', 'repeat_password', 'current_password'], 'string', 'max'=>255],
+			[['password', 'repeat_password', 'current_password'], 'string', 'max' => 255],
 			[['password', 'repeat_password', 'current_password'], 'trim'],
 			['password', 'match', 'pattern' => Yii::$app->getModule('user-management')->passwordRegexp],
 
-			['repeat_password', 'compare', 'compareAttribute'=>'password'],
+			['repeat_password', 'compare', 'compareAttribute' => 'password'],
 
-			['current_password', 'required', 'except'=>'restoreViaEmail'],
-			['current_password', 'validateCurrentPassword', 'except'=>'restoreViaEmail'],
+			['current_password', 'required', 'except' => 'restoreViaEmail'],
+			['current_password', 'validateCurrentPassword', 'except' => 'restoreViaEmail'],
 		];
 	}
 
@@ -59,15 +65,13 @@ class ChangeOwnPasswordForm extends Model
 	 */
 	public function validateCurrentPassword()
 	{
-		if ( !Yii::$app->getModule('user-management')->checkAttempts() )
-		{
+		if (!Yii::$app->getModule('user-management')->checkAttempts()) {
 			$this->addError('current_password', UserManagementModule::t('back', 'Too many attempts'));
 
 			return false;
 		}
 
-		if ( !Yii::$app->security->validatePassword($this->current_password, $this->user->password_hash) )
-		{
+		if (!Yii::$app->security->validatePassword($this->current_password, $this->user->password_hash)) {
 			$this->addError('current_password', UserManagementModule::t('back', "Wrong password"));
 		}
 	}
@@ -79,8 +83,7 @@ class ChangeOwnPasswordForm extends Model
 	 */
 	public function changePassword($performValidation = true)
 	{
-		if ( $performValidation AND !$this->validate() )
-		{
+		if ($performValidation and !$this->validate()) {
 			return false;
 		}
 

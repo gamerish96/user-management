@@ -1,4 +1,5 @@
 <?php
+
 namespace webvimark\modules\UserManagement\models\rbacDB;
 
 use Exception;
@@ -7,6 +8,9 @@ use Yii;
 use yii\helpers\ArrayHelper;
 use yii\rbac\DbManager;
 
+/**
+ * 
+ */
 class Role extends AbstractItem
 {
 	const ITEM_TYPE = self::TYPE_ROLE;
@@ -39,7 +43,7 @@ class Role extends AbstractItem
 
 		$permissionNames = ArrayHelper::map($rbacPermissions, 'name', 'description');
 
-		return $asArray ? $permissionNames : Permission::find()->andWhere(['name'=>array_keys($permissionNames)])->all();
+		return $asArray ? $permissionNames : Permission::find()->andWhere(['name' => array_keys($permissionNames)])->all();
 	}
 
 	/**
@@ -54,7 +58,7 @@ class Role extends AbstractItem
 	 */
 	public static function getAvailableRoles($showAll = false, $asArray = false)
 	{
-		$condition = (Yii::$app->user->isSuperAdmin OR $showAll) ? [] : ['name'=>Yii::$app->session->get(AuthHelper::SESSION_PREFIX_ROLES)];
+		$condition = (Yii::$app->user->isSuperAdmin or $showAll) ? [] : ['name' => Yii::$app->session->get(AuthHelper::SESSION_PREFIX_ROLES)];
 
 		$result = static::find()->andWhere($condition)->all();
 
@@ -78,53 +82,44 @@ class Role extends AbstractItem
 	{
 		$role = static::findOne(['name' => $roleName]);
 
-		if ( !$role )
+		if (!$role)
 			throw new \InvalidArgumentException("Role with name = {$roleName} not found");
 
 
 		$permission = Permission::findOne(['name' => $permissionName]);
 
-		if ( !$permission )
-		{
+		if (!$permission) {
 			$permission = Permission::create($permissionName, $permissionDescription, $groupCode);
 
-			if ( $permission->hasErrors() )
+			if ($permission->hasErrors())
 				return $permission;
 		}
 
-		try
-		{
+		try {
 			Yii::$app->db->createCommand()
 				->insert(Yii::$app->getModule('user-management')->auth_item_child_table, [
 					'parent' => $role->name,
 					'child'  => $permission->name,
 				])->execute();
-
-		}
-		catch (Exception $e)
-		{
+		} catch (Exception $e) {
 			// Don't throw Exception because we may have this permission for this role,
 			// but need to add new routes to it
 		}
 
-		$routes = (array)$routes;
+		$routes = (array) $routes;
 
-		foreach ($routes as $route)
-		{
-			$route = '/'. ltrim($route, '/');
+		foreach ($routes as $route) {
+			$route = '/' . ltrim($route, '/');
 
 			Route::create($route);
 
-			try
-			{
+			try {
 				Yii::$app->db->createCommand()
 					->insert(Yii::$app->getModule('user-management')->auth_item_child_table, [
 						'parent' => $permission->name,
 						'child'  => $route,
 					])->execute();
-			}
-			catch (Exception $e)
-			{
+			} catch (Exception $e) {
 				// Don't throw Exception because this permission may already have this route,
 				// so just go to the next route
 			}

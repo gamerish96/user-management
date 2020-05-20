@@ -17,16 +17,16 @@ use yii\behaviors\TimestampBehavior;
 class AuthItemGroup extends \yii\db\ActiveRecord
 {
 	/**
-	* @inheritdoc
-	*/
+	 * @inheritdoc
+	 */
 	public static function tableName()
 	{
 		return Yii::$app->getModule('user-management')->auth_item_group_table;
 	}
 
 	/**
-	* @inheritdoc
-	*/
+	 * @inheritdoc
+	 */
 	public function behaviors()
 	{
 		return [
@@ -35,8 +35,8 @@ class AuthItemGroup extends \yii\db\ActiveRecord
 	}
 
 	/**
-	* @inheritdoc
-	*/
+	 * @inheritdoc
+	 */
 	public function rules()
 	{
 		return [
@@ -49,8 +49,8 @@ class AuthItemGroup extends \yii\db\ActiveRecord
 	}
 
 	/**
-	* @inheritdoc
-	*/
+	 * @inheritdoc
+	 */
 	public function attributeLabels()
 	{
 		return [

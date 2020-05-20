@@ -24,7 +24,7 @@ use Yii;
  */
 class UserVisitLog extends \webvimark\components\BaseActiveRecord
 {
-	CONST SESSION_TOKEN = '__visitorToken';
+	const SESSION_TOKEN = '__visitorToken';
 
 	/**
 	 * Save new record in DB and write unique token in session
@@ -39,7 +39,7 @@ class UserVisitLog extends \webvimark\components\BaseActiveRecord
 		$model->user_id    = $userId;
 		$model->token      = uniqid();
 		$model->ip         = LittleBigHelper::getRealIp();
-		$model->language   = isset( $_SERVER['HTTP_ACCEPT_LANGUAGE'] ) ? substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2) : '';
+		$model->language   = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2) : '';
 		$model->browser    = $browser->getBrowser();
 		$model->os         = $browser->getPlatform();
 		$model->user_agent = $browser->getUserAgent();
@@ -59,13 +59,12 @@ class UserVisitLog extends \webvimark\components\BaseActiveRecord
 			return;
 
 		$model = static::find()
-			->andWhere(['user_id'=>Yii::$app->user->id])
+			->andWhere(['user_id' => Yii::$app->user->id])
 			->orderBy('id DESC')
 			->asArray()
 			->one();
 
-		if ( !$model OR ($model['token'] !== Yii::$app->session->get(self::SESSION_TOKEN)) )
-		{
+		if (!$model or ($model['token'] !== Yii::$app->session->get(self::SESSION_TOKEN))) {
 			Yii::$app->user->logout();
 
 			echo "<script> location.reload();</script>";
@@ -74,16 +73,16 @@ class UserVisitLog extends \webvimark\components\BaseActiveRecord
 	}
 
 	/**
-	* @inheritdoc
-	*/
+	 * @inheritdoc
+	 */
 	public static function tableName()
 	{
 		return Yii::$app->getModule('user-management')->user_visit_log_table;
 	}
 
 	/**
-	* @inheritdoc
-	*/
+	 * @inheritdoc
+	 */
 	public function rules()
 	{
 		return [
@@ -98,8 +97,8 @@ class UserVisitLog extends \webvimark\components\BaseActiveRecord
 	}
 
 	/**
-	* @inheritdoc
-	*/
+	 * @inheritdoc
+	 */
 	public function attributeLabels()
 	{
 		return [
@@ -116,8 +115,8 @@ class UserVisitLog extends \webvimark\components\BaseActiveRecord
 	}
 
 	/**
-	* @return \yii\db\ActiveQuery
-	*/
+	 * @return \yii\db\ActiveQuery
+	 */
 	public function getUser()
 	{
 		return $this->hasOne(User::className(), ['id' => 'user_id']);
